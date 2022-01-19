@@ -2,10 +2,11 @@
 
 {% block content %}
 
-  {% if user %}
-  {{user}}
-  {% else %}
-  Hello Stanger
+  {% if current_user.is_authenticated %}
+    <h2>Hello, {{current_user.username}}</h2>
+    {% else %}
+    <h2>Hello, Stranger</h2>
+
   {% endif %}
 
 {% endblock content %}
