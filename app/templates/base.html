@@ -15,11 +15,22 @@
 
   <p>
     <a href="{{ url_for('main.index') }}">Home</a>
+
     {% if current_user.is_authenticated %}
       <a href="{{ url_for('auth.logout') }}">Logout</a>
+
+      {% if current_user.is_administrator %}
+      <a href="{{ url_for('main.for_admin') }}">Admin</a>
+      <a href="{{ url_for('main.for_user') }}">Users</a>
+    {% else %}
+      <a href="{{ url_for('main.for_user') }}">Users</a>
+    {% endif %}
+
+
     {% else %}
       <a href="{{ url_for('auth.login') }}">Login</a>
     {% endif %}
+
   </p>
   <hr>
   {% with messages = get_flashed_messages() %}
