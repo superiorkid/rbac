@@ -21,6 +21,7 @@ class User(UserMixin, db.Model):
 
   def __init__(self, **kwargs):
     super(User, self).__init__(**kwargs)
+
     if self.role is None:
 
       if self.email == current_app.config['IS_ADMIN']:
@@ -57,6 +58,9 @@ class Role(db.Model):
   default = db.Column(db.Boolean, default=False, index=True)
   permissions = db.Column(db.Integer)
   users = db.relationship('User', backref='role', lazy='dynamic')
+
+  def __repr__(self):
+    return f'<User {self.name}>'
 
   def __init__(self, **kwargs):
     super(Role, self).__init__(**kwargs)
