@@ -2,8 +2,8 @@ from flask import render_template, abort, url_for, redirect, flash
 from . import main
 from flask_login import login_required, current_user
 from ..decorators import admin_required, permission_required
-from ..models import Permission, User
-from .forms import EditProfileForm
+from ..models import Permission, User, Role
+from .forms import EditProfileForm, EditProfileAdminForm
 from .. import db
 
 @main.route('/')
@@ -31,7 +31,7 @@ def user(username):
   if user is None:
     abort(404)
 
-  return render_template('user.html', user=user)
+  return render_template('user.html', user=user, title='Profile')
 
 
 @main.get('/edit-profile')
@@ -51,7 +51,32 @@ def edit_profile():
   form.name.data = current_user.name
   form.location.data = current_user.location
   form.about_me.data = current_user.about_me
-  return render_template('edit_profile.html', form=form)
+  return render_template('edit_profile.html', form=form, title="Edit Profile")
 
 
+@main.post('/edit-profile/<int:id>')
+@main.get('/edit-profile/<int:id>')
+@login_required
+@admin_required
+def edit_profile_admin(id):
+  user = User.query.get_or_404(id)
+  form = EditProfileAdminForm(user=user)
 
+  if form.validate_on_submit():
+    user.email = form.email.data
+    user.username = form.username.data
+    user.role = Role.query.get(form.role.data)
+    user.name = form.name.data
+    user.location = form.location.data
+    user.about_me = form.about_me.data
+    db.session.commit()
+    flash('The profile has been updated.')
+    return redirect(url_for('.user', username=user.username))
+
+  form.email.data = user.email
+  form.username.data = user.username
+  form.role.data = user.role_id
+  form.name.data = user.name
+  form.location.data = user.location
+  form.about_me.data = user.about_me
+  return render_template('edit_profile.html', form=form, user=user, title='Edit Profile [Admin]')

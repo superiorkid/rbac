@@ -33,10 +33,22 @@
     Last_seen {{ moment(user.last_seen).fromNow() }}
   </p>
 
+  <br>
+
   {% if user == current_user %}
+
     <a href="{{ url_for('main.edit_profile') }}">
       Edit profile
     </a>
   {% endif %}
+
+  <br>
+
+  {% if current_user.is_administrator() %}
+    <a href="{{ url_for('main.edit_profile_admin', id=user.id) }}">
+      Edit profile [Admin]
+    </a>
+  {% endif %}
+
 
 {% endblock content %}

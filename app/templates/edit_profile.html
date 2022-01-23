@@ -7,6 +7,34 @@
   <form method="post">
     {{form.hidden_tag()}}
 
+    {% if  current_user.is_administrator() %}
+    <p>
+      {{ form.email.label }} <br>
+      {{ form.email }} <br>
+
+      {% for error in form.email.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
+    </p>
+
+    <p>
+      {{ form.username.label }} <br>
+      {{ form.username }} <br>
+
+      {% for error in form.username.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
+    </p>
+
+    <p>
+      {{ form.role.label }} <br>
+      {{ form.role }} <br>
+
+      {% for error in form.role.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
+    </p>
+
     <p>
       {{ form.name.label }} <br>
       {{ form.name }} <br>
@@ -36,6 +64,7 @@
 
     {{ form.submit() }}
 
+    {% endif %}
 
   </form>
 
