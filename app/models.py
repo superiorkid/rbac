@@ -2,6 +2,7 @@ from . import db, login_manager
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
 from flask import current_app
+from datetime import datetime
 
 class User(UserMixin, db.Model):
   id = db.Column(db.Integer, primary_key=True)
@@ -9,6 +10,11 @@ class User(UserMixin, db.Model):
   email = db.Column(db.String(64), index=True, unique=True)
   password_hash = db.Column(db.String(128))
   role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
+  name = db.Column(db.String(64))
+  location = db.Column(db.String(64))
+  about_me = db.Column(db.Text())
+  member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+  last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
 
   def __repr__(self):
     return f'<Username {self.username}>'
@@ -21,6 +27,7 @@ class User(UserMixin, db.Model):
 
   def __init__(self, **kwargs):
     super(User, self).__init__(**kwargs)
+
     if self.role is None:
 
       if self.email == current_app.config['IS_ADMIN']:
@@ -29,12 +36,15 @@ class User(UserMixin, db.Model):
       if self.role is None:
         self.role = Role.query.filter_by(default=True).first()
 
-
   def can(self, permissions):
     return self.role is not None and (self.role.permissions & permissions) == permissions
 
   def is_administrator(self):
     return self.can(Permission.ADMINISTER)
+
+  def ping(self):
+    self.last_seen = datetime.utcnow()
+    db.session.add(self)
 
 class AnonymouseUser(AnonymousUserMixin):
   def can(self, permissions):
@@ -63,25 +73,6 @@ class Role(db.Model):
 
   def __repr__(self):
     return f'<Role {self.name}>'
-
-  def __init__(self, **kwargs):
-    super(Role, self).__init__(**kwargs)
-    if self.permissions is None:
-      self.permissions = 0
-
-  def add_permission(self, perm):
-    if not self.has_permission(perm):
-      self.permissions += perm
-
-  def remove_permission(self, perm):
-    if self.has_permission(perm):
-      self.permissions -= perm
-
-  def reset_permissions(self):
-    self.permissions = 0
-
-  def has_permission(self, perm):
-    return self.permissions & perm == perm
 
   @staticmethod
   def insert_roles():
