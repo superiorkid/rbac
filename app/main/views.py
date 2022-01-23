@@ -7,18 +7,17 @@ from ..models import Permission
 @main.route('/')
 @login_required
 def index():
-  return render_template('main/index.html', title="Index")
-
+  return render_template('main/index.html', title='Index')
 
 @main.route('/admin')
 @login_required
 @admin_required
-def for_admin():
-  return 'for administrator'
+def for_admin_only():
+  return 'For admin only'
 
 
-@main.route('/users')
+@main.route('/moderator')
 @login_required
-@permission_required(Permission.COMMENT)
-def for_user():
-  return 'for USER'
+@permission_required(Permission.MODERATE_COMMENTS)
+def for_moderator_only():
+  return 'FOR MODERATOR'
