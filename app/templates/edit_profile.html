@@ -34,6 +34,7 @@
         <span style="color: red;">{{ error }}</span>
       {% endfor %}
     </p>
+    {% endif %}
 
     <p>
       {{ form.name.label }} <br>
@@ -64,7 +65,6 @@
 
     {{ form.submit() }}
 
-    {% endif %}
 
   </form>
 

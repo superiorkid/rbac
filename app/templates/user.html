@@ -35,19 +35,23 @@
 
   <br>
 
-  {% if user == current_user %}
-
-    <a href="{{ url_for('main.edit_profile') }}">
-      Edit profile
-    </a>
-  {% endif %}
 
   <br>
+
+
+
+  {% if current_user.is_administrator()  or user == current_user%}
 
   {% if current_user.is_administrator() %}
     <a href="{{ url_for('main.edit_profile_admin', id=user.id) }}">
       Edit profile [Admin]
     </a>
+  {% elif user == current_user %}
+     <a href="{{ url_for('main.edit_profile') }}">
+      Edit profile
+    </a>
+  {% endif %}
+
   {% endif %}
 
 
