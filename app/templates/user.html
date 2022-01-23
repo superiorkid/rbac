@@ -33,4 +33,10 @@
     Last_seen {{ moment(user.last_seen).fromNow() }}
   </p>
 
+  {% if user == current_user %}
+    <a href="{{ url_for('main.edit_profile') }}">
+      Edit profile
+    </a>
+  {% endif %}
+
 {% endblock content %}

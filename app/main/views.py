@@ -1,8 +1,10 @@
-from flask import render_template, abort, url_for, redirect
+from flask import render_template, abort, url_for, redirect, flash
 from . import main
 from flask_login import login_required, current_user
 from ..decorators import admin_required, permission_required
 from ..models import Permission, User
+from .forms import EditProfileForm
+from .. import db
 
 @main.route('/')
 @login_required
@@ -23,11 +25,33 @@ def for_moderator_only():
   return 'FOR MODERATOR'
 
 
-@main.post('/user/<username>')
-@main.get('/user/<username>')
+@main.route('/user/<username>')
 def user(username):
   user = User.query.filter_by(username=username).first()
   if user is None:
     abort(404)
 
   return render_template('user.html', user=user)
+
+
+@main.get('/edit-profile')
+@main.post('/edit-profile')
+@login_required
+def edit_profile():
+  form = EditProfileForm()
+
+  if form.validate_on_submit():
+    current_user.name = form.name.data
+    current_user.location = form.location.data
+    current_user.about_me = form.about_me.data
+    db.session.commit()
+    flash('Your changes have been saved.')
+    return redirect(url_for('.user', username=current_user.username))
+
+  form.name.data = current_user.name
+  form.location.data = current_user.location
+  form.about_me.data = current_user.about_me
+  return render_template('edit_profile.html', form=form)
+
+
+
