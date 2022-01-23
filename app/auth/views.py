@@ -2,7 +2,7 @@ from . import auth
 from .forms import LoginForm, RegistrationForm
 from flask import render_template, flash, redirect, url_for, request
 from ..models import User
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.urls import url_parse
 from .. import db
 
@@ -51,3 +51,10 @@ def logout():
   logout_user()
   flash('You have been logged out')
   return redirect(url_for('main.index'))
+
+
+@auth.before_app_request
+def before_request():
+  if current_user.is_authenticated:
+    current_user.ping()
+    db.session.commit()
