@@ -10,6 +10,8 @@
   <title>Document</title>
   {% endif %}
 
+  {{ moment.include_moment() }}
+
 </head>
 <body>
 
@@ -18,10 +20,10 @@
 
     {% if current_user.is_authenticated %}
       <a href="{{ url_for('auth.logout') }}">Logout</a>
+      <a href="{{ url_for('main.user', username=current_user.username) }}">Profile</a>
 
       {% if current_user.is_administrator() %}
         <a href="{{ url_for('main.for_admin_only') }}">admin</a>
-        <a href="#">user</a>
       {% else %}
         <a href="#">user</a>
       {% endif %}
