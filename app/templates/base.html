@@ -20,10 +20,10 @@
       <a href="{{ url_for('auth.logout') }}">Logout</a>
 
       {% if current_user.is_administrator() %}
-        <a href="{{ url_for('main.for_user')}}">user</a>
-        <a href="{{ url_for('main.for_admin') }}">admin</a>
+        <a href="{{ url_for('main.for_admin_only') }}">admin</a>
+        <a href="#">user</a>
       {% else %}
-        <a href="{{ url_for('main.for_user')}}">user</a>
+        <a href="#">user</a>
       {% endif %}
 
     {% else %}

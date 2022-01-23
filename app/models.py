@@ -21,20 +21,20 @@ class User(UserMixin, db.Model):
 
   def __init__(self, **kwargs):
     super(User, self).__init__(**kwargs)
-
     if self.role is None:
 
       if self.email == current_app.config['IS_ADMIN']:
-        self.role = Role.query.filter_by(name='Administrator').first()
+        self.role = Role.query.filter_by(permissions=0xff).first()
 
       if self.role is None:
         self.role = Role.query.filter_by(default=True).first()
 
-  def can(self, perm):
-    return self.role is not None and self.role.has_permission(perm)
+
+  def can(self, permissions):
+    return self.role is not None and (self.role.permissions & permissions) == permissions
 
   def is_administrator(self):
-    return self.can(Permission.ADMIN)
+    return self.can(Permission.ADMINISTER)
 
 class AnonymouseUser(AnonymousUserMixin):
   def can(self, permissions):
@@ -47,9 +47,11 @@ login_manager.anonymous_user = AnonymouseUser
 
 
 class Permission:
-  COMMENT = 1
-  WRITE = 2
-  ADMIN = 4
+  FOLLOW = 0x01
+  COMMENT = 0x02
+  WRITE_ARTICLES = 0x04
+  MODERATE_COMMENTS = 0x08
+  ADMINISTER = 0x80
 
 
 class Role(db.Model):
@@ -60,7 +62,7 @@ class Role(db.Model):
   users = db.relationship('User', backref='role', lazy='dynamic')
 
   def __repr__(self):
-    return f'<User {self.name}>'
+    return f'<Role {self.name}>'
 
   def __init__(self, **kwargs):
     super(Role, self).__init__(**kwargs)
@@ -84,26 +86,19 @@ class Role(db.Model):
   @staticmethod
   def insert_roles():
     roles = {
-      'User': [Permission.WRITE, Permission.COMMENT],
-      'Administrator': [Permission.WRITE, Permission.COMMENT, Permission.ADMIN]
+      'User': (Permission.FOLLOW | Permission.COMMENT | Permission.WRITE_ARTICLES, True),
+      'Moderator': (Permission.FOLLOW | Permission.COMMENT | Permission.WRITE_ARTICLES | Permission.MODERATE_COMMENTS, False),
+      'Administrator': (0xff, False)
     }
-    default_role = 'User'
 
     for r in roles:
       role = Role.query.filter_by(name=r).first()
-
       if role is None:
         role = Role(name=r)
 
-      role.reset_permissions()
-
-      for perm in roles[r]:
-        role.add_permission(perm)
-
-      role.default = (role.name == default_role)
-
+      role.permissions = roles[r][0]
+      role.default = roles[r][1]
       db.session.add(role)
-
     db.session.commit()
 
 
