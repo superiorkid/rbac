@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h1>Edit your profile</h1>
+
+  <form method="post">
+    {{form.hidden_tag()}}
+
+    <p>
+      {{ form.name.label }} <br>
+      {{ form.name }} <br>
+
+      {% for error in form.name.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
+    </p>
+
+    <p>
+      {{ form.location.label }} <br>
+      {{ form.location }} <br>
+
+      {% for error in form.location.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
+    </p>
+
+    <p>
+      {{ form.about_me.label }} <br>
+      {{ form.about_me }} <br>
+
+      {% for error in form.about_me.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
+    </p>
+
+    {{ form.submit() }}
+
+
+  </form>
+
+{% endblock content %}
