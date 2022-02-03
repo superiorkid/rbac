@@ -11,3 +11,10 @@ User :=> email: john@example.com, password : dog
 
 
 ```
+
+### Feature
+
+  - User Register
+  - User Login
+  - Admin/User Profile Editor
+

@@ -24,6 +24,7 @@
 
       {% if current_user.is_administrator() %}
         <a href="{{ url_for('main.for_admin_only') }}">admin</a>
+
       {% else %}
         <a href="#">user</a>
       {% endif %}
