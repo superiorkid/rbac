@@ -1,4 +1,4 @@
-# rbac (Role Base Access Control)
+# rbac (Role-Based Access Control)
 
 simple implementation of flask user role
 
